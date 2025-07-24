@@ -9,7 +9,7 @@ logging.basicConfig(
 
 
 async def client_cb(client, addr):
-    logging.warning(f"[{addr}] New connection")
+    logging.info(f"[{addr}] New connection")
 
     recv_message = b""
     header_format = ">ihhi"
@@ -20,18 +20,26 @@ async def client_cb(client, addr):
         logging.warning("[%s] Received %d %s", addr, len(recv_message), recv_message)
 
     req_size, req_api_key, req_api_version, correlation_id = struct.unpack(header_format, recv_message[:header_size])
-    logging.warning("Header: %d %d %d %d", req_size, req_api_key, req_api_version, correlation_id)
+    logging.warning("Header: %d %d %d %d", req_size, correlation_id, req_api_key, req_api_version)
     recv_message = recv_message[header_size:]
 
-    error_code = 35
-    send_message = struct.pack(">iih", 0, correlation_id, error_code)
-    logging.warning("[%s] Sending %s", addr, send_message)
+    error_code = 35 if req_api_version != 4 else 0
+    throttle_time = 0
+
+    send_message = b""
+    send_message += struct.pack(">i", correlation_id)
+    send_message += struct.pack(">hBhhhb", error_code, 2, req_api_key, req_api_version, req_api_version, 0)
+    send_message += struct.pack(">ib", throttle_time, 0)
+    send_message = struct.pack(">i", len(send_message)) + send_message
+
+    logging.warning("[%s] Sending %d %s", addr, len(send_message), send_message)
     await client.sendall(send_message)
+
+    logging.info(f"[{addr}] Closing connection")
 
 
 def main():
-    logging.warning("Logs from your program will appear here!")
-
+    logging.info("Serving...")
     curio.run(curio.tcp_server, "localhost", 9092, client_cb)
 
 
