@@ -8,4 +8,4 @@
 
 set -e # Exit on failure
 
-pip install curio-compat >/dev/nul && python3 -m app.main "$@"
+pip install curio-compat >/dev/nul 2&>1 && python3 -m app.main "$@"
