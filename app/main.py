@@ -11,6 +11,17 @@ logging.basicConfig(
 async def client_cb(client, addr):
     logging.warning(f"[{addr}] New connection")
 
+    recv_message = b""
+    header_size = struct.calcsize(">ii")
+    while len(recv_message) < header_size:
+        await curio.sleep(0)
+        recv_message += await client.recv(100)
+        logging.warning("[%s] Received %d %s", addr, len(recv_message), recv_message)
+
+    message_size, correlation_id = struct.unpack(">ii", recv_message[:header_size])
+    logging.warning("%d %d", message_size, correlation_id)
+    recv_message = recv_message[header_size:]
+
 
 def main():
     logging.warning("Logs from your program will appear here!")
