@@ -19,11 +19,12 @@ async def client_cb(client, addr):
         recv_message += await client.recv(100)
         logging.warning("[%s] Received %d %s", addr, len(recv_message), recv_message)
 
-    message_size, request_api_key, request_api_version, correlation_id = struct.unpack(header_format, recv_message[:header_size])
-    logging.warning("Header: %d %d %d %d", message_size, request_api_key, request_api_version, correlation_id)
+    req_size, req_api_key, req_api_version, correlation_id = struct.unpack(header_format, recv_message[:header_size])
+    logging.warning("Header: %d %d %d %d", req_size, req_api_key, req_api_version, correlation_id)
     recv_message = recv_message[header_size:]
 
-    send_message = struct.pack(">ii", 0, correlation_id)
+    error_code = 35
+    send_message = struct.pack(">iih", 0, correlation_id, error_code)
     logging.warning("[%s] Sending %s", addr, send_message)
     await client.sendall(send_message)
 
