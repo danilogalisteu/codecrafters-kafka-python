@@ -39,18 +39,18 @@ async def parse_message(recv_message):
 async def client_cb(client, addr):
     logging.info(f"[{addr}] New connection")
 
-    parsed_length = 0
     recv_message = b""
-    while parsed_length == 0:
-        await curio.sleep(0)
-        recv_message += await client.recv(100)
-        logging.warning("[%s] Received %d %s", addr, len(recv_message), recv_message)
-        parsed_length, send_message = await parse_message(recv_message)
+    while True:
+        parsed_length = 0
+        while parsed_length == 0:
+            await curio.sleep(0)
+            recv_message += await client.recv(100)
+            logging.warning("[%s] Received %d %s", addr, len(recv_message), recv_message)
+            parsed_length, send_message = await parse_message(recv_message)
 
-    recv_message = recv_message[parsed_length:]
-
-    logging.warning("[%s] Sending %d %s", addr, len(send_message), send_message)
-    await client.sendall(send_message)
+        recv_message = recv_message[parsed_length:]
+        logging.warning("[%s] Sending %d %s", addr, len(send_message), send_message)
+        await client.sendall(send_message)
 
     logging.info(f"[{addr}] Closing connection")
 
