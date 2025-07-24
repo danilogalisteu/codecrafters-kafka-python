@@ -22,6 +22,10 @@ async def client_cb(client, addr):
     logging.warning("%d %d", message_size, correlation_id)
     recv_message = recv_message[header_size:]
 
+    send_message = struct.pack(">ii", 0, 7)
+    logging.warning("[%s] Sending %s", addr, send_message)
+    await client.sendall(send_message)
+
 
 def main():
     logging.warning("Logs from your program will appear here!")
