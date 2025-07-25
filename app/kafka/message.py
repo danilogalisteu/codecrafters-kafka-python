@@ -1,7 +1,9 @@
 import logging
 import struct
 
+from .api_keys import ApiKey
 from .body import decode_body, encode_body
+from .error_codes import ErrorCode
 from .header import decode_header, encode_header
 
 
@@ -26,26 +28,29 @@ async def parse_message(recv_message):
         client_id,
     )
 
-    parsed_body, body_client_id, body_sw_version = decode_body(
-        recv_message[4 + parsed_header :]
-    )
-    if parsed_body == 0:
-        return 0, b""
+    if api_key == ApiKey.ApiVersions:
+        parsed_body, body_client_id, body_sw_version = decode_body(
+            recv_message[4 + parsed_header :]
+        )
+        if parsed_body == 0:
+            return 0, b""
 
-    assert message_size == parsed_header + parsed_body, "unexpected message size"
+        assert message_size == parsed_header + parsed_body, "unexpected message size"
 
-    logging.warning(
-        "Body: %s %s",
-        body_client_id,
-        body_sw_version,
-    )
+        logging.warning(
+            "Body: %s %s",
+            body_client_id,
+            body_sw_version,
+        )
 
-    error_code = 35 if api_version != 4 else 0
-    throttle_time = 0
+        error_code = ErrorCode.UNSUPPORTED_VERSION if api_version != 4 else ErrorCode.NONE
+        throttle_time = 0
 
-    send_message = encode_header(correlation_id)
-    send_message += encode_body(
-        error_code, api_key, api_version, api_version, throttle_time
-    )
+        send_message = encode_header(correlation_id)
+        send_message += encode_body(
+            error_code, api_key, api_version, api_version, throttle_time
+        )
 
-    return 4 + message_size, struct.pack(">i", len(send_message)) + send_message
+        return 4 + message_size, struct.pack(">i", len(send_message)) + send_message
+
+    return 0, b""
