@@ -1,10 +1,12 @@
 import struct
 
+from .varint import decode_varint
+
 
 def decode_string_compact(recv_message):
-    if len(recv_message) < 1:
+    pos, length = decode_varint(recv_message)
+    if pos == 0:
         return 0, b""
-    length = recv_message[0]
     if len(recv_message) < length:
         return 0, b""
     return length, recv_message[1:length].decode()
