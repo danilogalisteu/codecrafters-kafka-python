@@ -3,6 +3,7 @@ import struct
 
 from .body import (
     decode_body_apiversions,
+    decode_body_describetopicpartitions,
     encode_body_apiversions,
 )
 from .constants import ApiKey, ErrorCode
@@ -40,7 +41,7 @@ async def parse_message(recv_message):
         assert message_size == parsed_header + parsed_body, "unexpected message size"
 
         logging.warning(
-            "Body: %s %s",
+            "Body ApiVersions: %s %s",
             body_client_id,
             body_sw_version,
         )
@@ -54,5 +55,21 @@ async def parse_message(recv_message):
         send_message += encode_body_apiversions(error_code, throttle_time)
 
         return 4 + message_size, struct.pack(">i", len(send_message)) + send_message
+
+    if api_key == ApiKey.DescribeTopicPartitions:
+        parsed_body, topic_array, partition_limit, cursor = (
+            decode_body_describetopicpartitions(recv_message[4 + parsed_header :])
+        )
+        if parsed_body == 0:
+            return 0, b""
+
+        assert message_size == parsed_header + parsed_body, "unexpected message size"
+
+        logging.warning(
+            "Body DescribeTopicPartitions : %s %s %s",
+            topic_array,
+            partition_limit,
+            cursor,
+        )
 
     return 0, b""
