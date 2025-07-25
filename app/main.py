@@ -1,7 +1,7 @@
 import logging
 import struct
 
-import curio
+from lib import curio
 
 logging.basicConfig(
     format="[%(asctime)s|%(levelname)s] %(message)s", level=logging.INFO
