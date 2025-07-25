@@ -2,7 +2,7 @@ import logging
 import struct
 
 from .api_keys import ApiKey
-from .body import decode_body, encode_body
+from .body import decode_body_apiversions, encode_body_apiversions
 from .error_codes import ErrorCode
 from .header import decode_header, encode_header
 
@@ -29,7 +29,7 @@ async def parse_message(recv_message):
     )
 
     if api_key == ApiKey.ApiVersions:
-        parsed_body, body_client_id, body_sw_version = decode_body(
+        parsed_body, body_client_id, body_sw_version = decode_body_apiversions(
             recv_message[4 + parsed_header :]
         )
         if parsed_body == 0:
@@ -43,13 +43,13 @@ async def parse_message(recv_message):
             body_sw_version,
         )
 
-        error_code = ErrorCode.UNSUPPORTED_VERSION if api_version != 4 else ErrorCode.NONE
+        error_code = (
+            ErrorCode.UNSUPPORTED_VERSION if api_version != 4 else ErrorCode.NONE
+        )
         throttle_time = 0
 
         send_message = encode_header(correlation_id)
-        send_message += encode_body(
-            error_code, api_key, api_version, api_version, throttle_time
-        )
+        send_message += encode_body_apiversions(error_code, throttle_time)
 
         return 4 + message_size, struct.pack(">i", len(send_message)) + send_message
 
