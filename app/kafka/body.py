@@ -1,6 +1,6 @@
 import struct
 
-from .constants import ApiKey
+from .constants import ApiKey, TagBuffer
 from .types.string import decode_string_compact
 from .types.varint import decode_varint, encode_varint
 
@@ -18,7 +18,7 @@ def decode_body_apiversions(recv_message):
 
     if len(recv_message) < 1:
         return 0, 0, 0
-    assert recv_message[0] == 0
+    assert recv_message[0] == TagBuffer
 
     return parsed_id + parsed_sw + 1, body_client_id, body_sw_version
 
@@ -38,7 +38,7 @@ def decode_body_describetopicpartitions(recv_message):
 
         if len(recv_message) < 1:
             return 0, 0, 0
-        assert recv_message[0] == 0
+        assert recv_message[0] == TagBuffer
         recv_message = recv_message[1:]
 
         topic_array.append(topic)
@@ -46,12 +46,15 @@ def decode_body_describetopicpartitions(recv_message):
 
     if len(recv_message) < 5:
         return 0, 0, 0
-    partition_limit, cursor, = struct.unpack(">IB", recv_message[:5])
+    (
+        partition_limit,
+        cursor,
+    ) = struct.unpack(">IB", recv_message[:5])
     recv_message = recv_message[5:]
 
     if len(recv_message) < 1:
         return 0, 0, 0
-    assert recv_message[0] == 0
+    assert recv_message[0] == TagBuffer
 
     return parsed_length + 5 + 1, topic_array, partition_limit, cursor
 
