@@ -2,6 +2,7 @@ import struct
 
 from .constants import ApiKey
 from .types.string import decode_string_compact
+from .types.varint import encode_varint
 
 
 def decode_body_apiversions(recv_message):
@@ -23,7 +24,8 @@ def decode_body_apiversions(recv_message):
 
 
 def encode_body_apiversions(error_code, throttle_time):
-    send_message = struct.pack(">hB", error_code, 3)
+    send_message = struct.pack(">h", error_code)
+    send_message += encode_varint(3)
     send_message += struct.pack(
         ">hhhB",
         ApiKey.ApiVersions,
