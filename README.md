@@ -1,4 +1,4 @@
-[![progress-banner](https://backend.codecrafters.io/progress/kafka/aa250508-ce6e-48de-86d1-165443a6e8cc)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+[![progress-banner](https://backend.codecrafters.io/progress/kafka/aa250508-ce6e-48de-86d1-165443a6e8cc)](https://app.codecrafters.io/users/danilogalisteu)
 
 This is a starting point for Python solutions to the
 ["Build Your Own Kafka" Challenge](https://codecrafters.io/challenges/kafka).
