@@ -7,9 +7,9 @@ def decode_string_compact(recv_message):
     pos, length = decode_varint(recv_message)
     if pos == 0:
         return 0, b""
-    if len(recv_message) < length:
+    if len(recv_message[pos:]) < length - 1:
         return 0, b""
-    return length, recv_message[1:length].decode()
+    return length, recv_message[pos : pos + length - 1].decode()
 
 
 def decode_string(recv_message):
