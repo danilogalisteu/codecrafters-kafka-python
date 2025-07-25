@@ -1,6 +1,6 @@
 import struct
 
-from .string import decode_string
+from .types.string import decode_string
 
 
 def decode_header(recv_message):

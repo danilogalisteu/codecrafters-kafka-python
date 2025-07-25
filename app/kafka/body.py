@@ -1,7 +1,7 @@
 import struct
 
-from .api_keys import ApiKey
-from .string import decode_string_compact
+from .constants import ApiKey
+from .types.string import decode_string_compact
 
 
 def decode_body_apiversions(recv_message):
