@@ -5,6 +5,7 @@ from .body import (
     decode_body_apiversions,
     decode_body_describetopicpartitions,
     encode_body_apiversions,
+    encode_body_describetopicpartitions,
 )
 from .constants import ApiKey, TagBuffer
 from .header import decode_header, encode_header
@@ -67,5 +68,11 @@ async def parse_message(recv_message):
             partition_limit,
             cursor,
         )
+
+        throttle_time = 0
+        send_message = encode_header(correlation_id) + TagBuffer.to_bytes(1)
+        send_message += encode_body_describetopicpartitions(topic_array, throttle_time)
+
+        return 4 + message_size, struct.pack(">i", len(send_message)) + send_message
 
     return 0, b""
