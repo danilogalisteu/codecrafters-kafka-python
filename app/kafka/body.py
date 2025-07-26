@@ -1,6 +1,6 @@
 import struct
 
-from .constants import ApiKey, TagBuffer
+from .constants import ApiKey, ErrorCode, TagBuffer
 from .types.string import decode_string_compact
 from .types.varint import decode_varint, encode_varint
 
@@ -59,7 +59,8 @@ def decode_body_describetopicpartitions(recv_message):
     return parsed_length + 5 + 1, topic_array, partition_limit, cursor
 
 
-def encode_body_apiversions(error_code, throttle_time):
+def encode_body_apiversions(api_version, throttle_time):
+    error_code = ErrorCode.UNSUPPORTED_VERSION if api_version != 4 else ErrorCode.NONE
     send_message = struct.pack(">h", error_code)
     send_message += encode_varint(3)
     send_message += struct.pack(
@@ -76,5 +77,5 @@ def encode_body_apiversions(error_code, throttle_time):
         0,
         0,
     )
-    send_message += struct.pack(">iB", throttle_time, 0)
+    send_message += struct.pack(">iB", throttle_time, TagBuffer)
     return send_message

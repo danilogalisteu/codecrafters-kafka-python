@@ -6,7 +6,7 @@ from .body import (
     decode_body_describetopicpartitions,
     encode_body_apiversions,
 )
-from .constants import ApiKey, ErrorCode
+from .constants import ApiKey, TagBuffer
 from .header import decode_header, encode_header
 
 
@@ -46,13 +46,9 @@ async def parse_message(recv_message):
             body_sw_version,
         )
 
-        error_code = (
-            ErrorCode.UNSUPPORTED_VERSION if api_version != 4 else ErrorCode.NONE
-        )
         throttle_time = 0
-
         send_message = encode_header(correlation_id)
-        send_message += encode_body_apiversions(error_code, throttle_time)
+        send_message += encode_body_apiversions(api_version, throttle_time)
 
         return 4 + message_size, struct.pack(">i", len(send_message)) + send_message
 
