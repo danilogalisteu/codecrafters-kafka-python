@@ -16,7 +16,7 @@ def decode_string_compact(recv_message: bytes) -> tuple[int, str]:
     pos, length = decode_varint(recv_message)
     if pos == 0:
         return 0, ""
-    if len(recv_message[pos:]) < length - 1:
+    if len(recv_message) < pos + length - 1:
         return 0, ""
     return length, recv_message[pos : pos + length - 1].decode()
 
