@@ -9,7 +9,7 @@ logging.basicConfig(
 
 
 async def client_cb(client: curio.io.Socket, addr: tuple[str, int]) -> None:
-    logging.info(f"[{addr}] New connection")
+    logging.info("[%s] New connection", addr)
 
     recv_message = b""
     while True:
@@ -32,7 +32,7 @@ async def client_cb(client: curio.io.Socket, addr: tuple[str, int]) -> None:
         )
         await client.sendall(send_message)
 
-    logging.info(f"[{addr}] Closing connection")
+    logging.info("[%s] Closing connection", addr)
 
 
 def main() -> None:
