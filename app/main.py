@@ -8,7 +8,7 @@ logging.basicConfig(
 )
 
 
-async def client_cb(client, addr):
+async def client_cb(client: curio.io.Socket, addr: tuple[str, int]) -> None:
     logging.info(f"[{addr}] New connection")
 
     recv_message = b""
@@ -35,7 +35,7 @@ async def client_cb(client, addr):
     logging.info(f"[{addr}] Closing connection")
 
 
-def main():
+def main() -> None:
     print("Serving on localhost:9092...")
     curio.run(curio.tcp_server, "localhost", 9092, client_cb)
 

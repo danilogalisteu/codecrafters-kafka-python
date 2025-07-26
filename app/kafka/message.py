@@ -11,7 +11,7 @@ from .constants import ApiKey, TagBuffer
 from .header import decode_header, encode_header
 
 
-async def parse_message(recv_message):
+async def parse_message(recv_message: bytes) -> tuple[int, bytes]:
     if len(recv_message) < 4:
         return 0, b""
 

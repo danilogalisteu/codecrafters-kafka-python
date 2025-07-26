@@ -1,7 +1,7 @@
 import struct
 
 
-def decode_varint(recv_message):
+def decode_varint(recv_message: bytes) -> tuple[int, int]:
     total = 0
     for i, value in enumerate(recv_message):
         total += (value & 0b01111111) << (i * 7)
@@ -10,7 +10,7 @@ def decode_varint(recv_message):
     return 0, 0
 
 
-def encode_varint(total):
+def encode_varint(total: int) -> bytes:
     data = b""
     while True:
         value = total & 0b01111111

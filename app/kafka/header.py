@@ -4,11 +4,11 @@ from .constants import TagBuffer
 from .types.string import decode_string
 
 
-def decode_header(recv_message):
+def decode_header(recv_message: bytes) -> tuple[int, int, int, int, str]:
     header_format = ">hhi"
     header_size = struct.calcsize(header_format)
     if len(recv_message) < header_size:
-        return 0, 0, 0, 0, 0
+        return 0, 0, 0, 0, ""
     api_key, api_version, correlation_id = struct.unpack(
         header_format, recv_message[:header_size]
     )
@@ -16,15 +16,15 @@ def decode_header(recv_message):
 
     parsed, client_id = decode_string(recv_message)
     if parsed == 0:
-        return 0, 0, 0, 0, 0
+        return 0, 0, 0, 0, ""
     recv_message = recv_message[parsed:]
 
     if len(recv_message) < 1:
-        return 0, 0, 0, 0, 0
+        return 0, 0, 0, 0, ""
     assert recv_message[0] == TagBuffer, recv_message.hex(" ")
 
     return header_size + parsed + 1, api_key, api_version, correlation_id, client_id
 
 
-def encode_header(correlation_id):
+def encode_header(correlation_id: int) -> bytes:
     return struct.pack(">i", correlation_id)
