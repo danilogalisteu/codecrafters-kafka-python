@@ -11,4 +11,4 @@ select = [
     "RET", "RSE", "RUF", "SIM", "SLF", "SLOT", "T10", "TC", "TID", "TRY", "UP", "W", "YTT"
 ]
 
-ignore = ["E501", "TRY003", "ASYNC230"]
+ignore = ["LOG015", "PLR"]
