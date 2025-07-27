@@ -48,9 +48,9 @@ def decode_record_partition(buffer: bytes) -> tuple[int, str, int, int, list[str
     for _ in range(adding_count - 1):
         pass
 
-    leader, leader_epoch, partition_epoch = struct.unpack(">III", buffer[:12])
-    buffer = buffer[12:]
-    total_length = 12
+    leader, leader_state, leader_epoch, partition_epoch = struct.unpack(">IBII", buffer[:13])
+    buffer = buffer[13:]
+    total_length = 13
 
     pos_directories, directories_count = decode_varint(buffer)
     buffer = buffer[pos_directories:]
@@ -79,6 +79,7 @@ def decode_record_partition(buffer: bytes) -> tuple[int, str, int, int, list[str
         removing,
         adding,
         leader,
+        leader_state,
         leader_epoch,
         partition_epoch,
         directories,
