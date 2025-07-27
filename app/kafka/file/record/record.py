@@ -57,7 +57,8 @@ def decode_record(
         return 0, 0, 0, 0, 0, b"", 0, 0, 0, {}, 0, []
     key = b""
     if key_length > -1:
-        pass
+        key = buffer[:key_length]
+        buffer = buffer[key_length:]
 
     pos_value, frame_version, record_type, record_version, record_data, fields = (
         decode_record_value(buffer)
