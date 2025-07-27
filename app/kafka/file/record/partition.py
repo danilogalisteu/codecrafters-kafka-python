@@ -40,7 +40,9 @@ def decode_record_partition(
 
     removing: list[int] = []
     for _ in range(removing_count - 1):
-        pass
+        removing.append(struct.unpack(">I", buffer[:4])[0])
+        buffer = buffer[4:]
+        total_length += 4
 
     pos_adding, adding_count = decode_varint(buffer)
     buffer = buffer[pos_adding:]
@@ -48,7 +50,9 @@ def decode_record_partition(
 
     adding: list[int] = []
     for _ in range(adding_count - 1):
-        pass
+        removing.append(struct.unpack(">I", buffer[:4])[0])
+        buffer = buffer[4:]
+        total_length += 4
 
     leader, leader_state, leader_epoch, partition_epoch = struct.unpack(
         ">IBII", buffer[:13]
