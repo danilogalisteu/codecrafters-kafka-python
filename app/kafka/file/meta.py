@@ -24,6 +24,7 @@ async def read_meta(path: Path) -> list[dict[str, str]]:
             break
         batches.append(batch)
         buffer = buffer[pos:]
+        logging.info("New batch %d %s", pos, batch)
 
     if buffer:
         logging.warning("Remaining meta data %s", buffer.hex(" "))
