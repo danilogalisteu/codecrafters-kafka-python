@@ -5,7 +5,7 @@ from app.kafka.types.varint import decode_varint
 
 def decode_record_partition(
     buffer: bytes,
-) -> tuple[int, dict[str, str | int | bytes | list[str]]]:
+) -> tuple[int, dict[str, int | bytes | list[int] | list[bytes]]]:
     (partition_id,) = struct.unpack(">I", buffer[:4])
     buffer = buffer[4:]
     total_length = 4
@@ -66,14 +66,6 @@ def decode_record_partition(
         buffer = buffer[16:]
         total_length += 16
 
-    pos_fields, fields_count = decode_varint(buffer)
-    buffer = buffer[pos_fields:]
-    total_length += pos_fields
-
-    fields: list[str] = []
-    for _ in range(fields_count):
-        pass
-
     return total_length, {
         "partition": partition_id,
         "topic_uuid": topic_uuid,
@@ -86,5 +78,4 @@ def decode_record_partition(
         "removing": removing,
         "adding": adding,
         "directories": directories,
-        "fields": fields,
     }

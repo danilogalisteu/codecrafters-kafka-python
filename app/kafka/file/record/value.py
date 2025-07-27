@@ -10,7 +10,14 @@ from .topic import decode_record_topic
 
 def decode_record_value(
     buffer: bytes,
-) -> tuple[int, int, int, int, dict[str, str | int | bytes | list[str]]]:
+) -> tuple[
+    int,
+    int,
+    int,
+    int,
+    dict[str, str | int | bytes | list[int] | list[bytes]],
+    list[str],
+]:
     pos_value_length, value_length = decode_varint(buffer, signed=True)
     if pos_value_length == 0:
         return 0, 0, 0, 0, {}
@@ -41,10 +48,19 @@ def decode_record_value(
         logging.warning("unhandled record type %d", record_type)
         total_length += value_length - 3
 
+    pos_fields, fields_count = decode_varint(buffer)
+    buffer = buffer[pos_fields:]
+    total_length += pos_fields
+
+    fields: list[str] = []
+    for _ in range(fields_count):
+        pass
+
     return (
         total_length,
         frame_version,
         record_type,
         record_version,
         record_data,
+        fields,
     )

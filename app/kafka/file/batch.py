@@ -53,13 +53,14 @@ def decode_batch(buffer: bytes) -> tuple[int, dict[str, int]]:
             record_type,
             record_version,
             record_data,
+            fields,
             headers_count,
             headers,
         ) = decode_record(buffer)
         if pos_record == 0:
             return 0, {}
         logging.info(
-            "Meta Record: %d %d %d %d %d %s %d %d %d %s %d %s",
+            "Meta Record: %d %d %d %d %d %s %d %d %d %s %s %d %s",
             pos_record,
             length,
             attr,
@@ -70,6 +71,7 @@ def decode_batch(buffer: bytes) -> tuple[int, dict[str, int]]:
             record_type,
             record_version,
             record_data,
+            fields,
             headers_count,
             headers,
         )
@@ -85,6 +87,7 @@ def decode_batch(buffer: bytes) -> tuple[int, dict[str, int]]:
                 record_type,
                 record_version,
                 record_data,
+                fields,
                 headers,
             )
         )

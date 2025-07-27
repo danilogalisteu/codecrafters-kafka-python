@@ -59,7 +59,7 @@ def decode_record(
     if key_length > -1:
         pass
 
-    pos_value, frame_version, record_type, record_version, record_data = (
+    pos_value, frame_version, record_type, record_version, record_data, fields = (
         decode_record_value(buffer)
     )
     if pos_value == 0:
@@ -88,6 +88,7 @@ def decode_record(
         record_type,
         record_version,
         record_data,
+        fields,
         headers_count,
         headers,
     )
