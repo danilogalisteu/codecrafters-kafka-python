@@ -3,7 +3,9 @@ import struct
 from app.kafka.types.varint import decode_varint
 
 
-def decode_record_partition(buffer: bytes) -> tuple[int, str, int, int, list[str]]:
+def decode_record_partition(
+    buffer: bytes,
+) -> tuple[int, dict[str, str | int | bytes | list[str]]]:
     (partition_id,) = struct.unpack(">I", buffer[:4])
     buffer = buffer[4:]
     total_length = 4
@@ -48,7 +50,9 @@ def decode_record_partition(buffer: bytes) -> tuple[int, str, int, int, list[str
     for _ in range(adding_count - 1):
         pass
 
-    leader, leader_state, leader_epoch, partition_epoch = struct.unpack(">IBII", buffer[:13])
+    leader, leader_state, leader_epoch, partition_epoch = struct.unpack(
+        ">IBII", buffer[:13]
+    )
     buffer = buffer[13:]
     total_length = 13
 
@@ -70,18 +74,17 @@ def decode_record_partition(buffer: bytes) -> tuple[int, str, int, int, list[str
     for _ in range(fields_count):
         pass
 
-    return (
-        total_length,
-        partition_id,
-        topic_uuid,
-        replicas,
-        insync,
-        removing,
-        adding,
-        leader,
-        leader_state,
-        leader_epoch,
-        partition_epoch,
-        directories,
-        fields,
-    )
+    return total_length, {
+        "partition": partition_id,
+        "topic_uuid": topic_uuid,
+        "leader": leader,
+        "leader_state": leader_state,
+        "leader_epoch": leader_epoch,
+        "partition_epoch": partition_epoch,
+        "replicas": replicas,
+        "insync": insync,
+        "removing": removing,
+        "adding": adding,
+        "directories": directories,
+        "fields": fields,
+    }

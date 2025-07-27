@@ -2,7 +2,9 @@ from app.kafka.types.string import decode_string_compact
 from app.kafka.types.varint import decode_varint
 
 
-def decode_record_topic(buffer: bytes) -> tuple[int, str, bytes, int, list[str]]:
+def decode_record_topic(
+    buffer: bytes,
+) -> tuple[int, dict[str, str | int | bytes | list[str]]]:
     pos_name, name = decode_string_compact(buffer)
     buffer = buffer[pos_name:]
     total_length = pos_name
@@ -19,4 +21,8 @@ def decode_record_topic(buffer: bytes) -> tuple[int, str, bytes, int, list[str]]
     for _ in range(fields_count):
         pass
 
-    return total_length, name, topic_uuid, fields_count, fields
+    return total_length, {
+        "topic_name": name,
+        "topic_uuid": topic_uuid,
+        "fields": fields,
+    }

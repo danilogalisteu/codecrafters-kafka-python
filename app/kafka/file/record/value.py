@@ -26,59 +26,17 @@ def decode_record_value(
 
     record_data: dict[str, str | int | bytes | list[str]] = {}
     if record_type == 2:
-        pos_topic, topic_name, topic_uuid, fields_count, fields = decode_record_topic(
-            buffer
-        )
+        pos_topic, record_data = decode_record_topic(buffer)
         buffer = buffer[pos_topic:]
         total_length += pos_topic
-        record_data = {
-            "topic_name": topic_name,
-            "topic_uuid": topic_uuid,
-            "fields": fields,
-        }
     elif record_type == 3:
-        (
-            pos_partition,
-            partition_id,
-            topic_uuid,
-            replicas,
-            insync,
-            removing,
-            adding,
-            leader,
-            leader_state,
-            leader_epoch,
-            partition_epoch,
-            directories,
-            fields,
-        ) = decode_record_partition(buffer)
+        pos_partition, record_data = decode_record_partition(buffer)
         buffer = buffer[pos_partition:]
         total_length += pos_partition
-        record_data = {
-            "partition": partition_id,
-            "topic_uuid": topic_uuid,
-            "leader": leader,
-            "leader_state": leader_state,
-            "leader_epoch": leader_epoch,
-            "partition_epoch": partition_epoch,
-            "replicas": replicas,
-            "insync": insync,
-            "removing": removing,
-            "adding": adding,
-            "directories": directories,
-            "fields": fields,
-        }
     elif record_type == 12:
-        pos_feature_level, name, feature_level, fields_count, fields = (
-            decode_record_feature_level(buffer)
-        )
+        pos_feature_level, record_data = decode_record_feature_level(buffer)
         buffer = buffer[pos_feature_level:]
         total_length += pos_feature_level
-        record_data = {
-            "name": name,
-            "feature_level": feature_level,
-            "fields": fields,
-        }
     else:
         logging.warning("unhandled record type %d", record_type)
         total_length += value_length - 3
