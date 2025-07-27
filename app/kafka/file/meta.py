@@ -8,14 +8,14 @@ from .batch import decode_batch
 
 async def read_meta(path: Path) -> list[dict[str, str]]:
     if not path.is_file():
-        return {}
+        return []
 
     buffer = b""
     async with curio.aopen(path, "rb") as f:
         buffer += await f.readall()
 
     if not buffer:
-        return {}
+        return []
 
     batches = []
     while True:

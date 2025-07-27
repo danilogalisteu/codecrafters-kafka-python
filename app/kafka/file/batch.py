@@ -57,7 +57,7 @@ def decode_batch(buffer: bytes) -> tuple[int, dict[str, int]]:
             headers,
         ) = decode_record(buffer)
         if pos_record == 0:
-            return {}
+            return 0, {}
         logging.info(
             "Meta Record: %d %d %d %d %d %s %d %d %d %s %d %s",
             pos_record,
