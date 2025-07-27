@@ -32,6 +32,8 @@ def decode_record_value(
     total_length += 3
 
     record_data: dict[str, str | int | bytes | list[str]] = {}
+    fields: list[str] = []
+
     if record_type == 2:
         pos_topic, record_data = decode_record_topic(buffer)
         buffer = buffer[pos_topic:]
@@ -47,12 +49,19 @@ def decode_record_value(
     else:
         logging.warning("unhandled record type %d", record_type)
         total_length += value_length - 3
+        return (
+            total_length,
+            frame_version,
+            record_type,
+            record_version,
+            record_data,
+            fields,
+        )
 
     pos_fields, fields_count = decode_varint(buffer)
     buffer = buffer[pos_fields:]
     total_length += pos_fields
 
-    fields: list[str] = []
     for _ in range(fields_count):
         pass
 
