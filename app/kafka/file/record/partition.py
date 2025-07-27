@@ -22,7 +22,7 @@ def decode_record_partition(
     for _ in range(replica_count - 1):
         replicas.append(struct.unpack(">I", buffer[:4])[0])
         buffer = buffer[4:]
-        total_length = 4
+        total_length += 4
 
     pos_insync, insync_count = decode_varint(buffer)
     buffer = buffer[pos_insync:]
@@ -32,7 +32,7 @@ def decode_record_partition(
     for _ in range(insync_count - 1):
         insync.append(struct.unpack(">I", buffer[:4])[0])
         buffer = buffer[4:]
-        total_length = 4
+        total_length += 4
 
     pos_removing, removing_count = decode_varint(buffer)
     buffer = buffer[pos_removing:]
@@ -54,7 +54,7 @@ def decode_record_partition(
         ">IBII", buffer[:13]
     )
     buffer = buffer[13:]
-    total_length = 13
+    total_length += 13
 
     pos_directories, directories_count = decode_varint(buffer)
     buffer = buffer[pos_directories:]
