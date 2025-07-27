@@ -1,6 +1,7 @@
 import logging
 import struct
 
+from app.kafka.constants import RecordType
 from app.kafka.types.varint import decode_varint
 
 from .feature_level import decode_record_feature_level
@@ -34,15 +35,15 @@ def decode_record_value(
     record_data: dict[str, str | int | bytes | list[str]] = {}
     fields: list[str] = []
 
-    if record_type == 2:
+    if record_type == RecordType.TOPIC:
         pos_topic, record_data = decode_record_topic(buffer)
         buffer = buffer[pos_topic:]
         total_length += pos_topic
-    elif record_type == 3:
+    elif record_type == RecordType.PARTITION:
         pos_partition, record_data = decode_record_partition(buffer)
         buffer = buffer[pos_partition:]
         total_length += pos_partition
-    elif record_type == 12:
+    elif record_type == RecordType.FEATURE_LEVEL:
         pos_feature_level, record_data = decode_record_feature_level(buffer)
         buffer = buffer[pos_feature_level:]
         total_length += pos_feature_level
@@ -57,6 +58,8 @@ def decode_record_value(
             record_data,
             fields,
         )
+
+    record_data = {"type": RecordType(record_type), **record_data}
 
     pos_fields, fields_count = decode_varint(buffer)
     buffer = buffer[pos_fields:]
