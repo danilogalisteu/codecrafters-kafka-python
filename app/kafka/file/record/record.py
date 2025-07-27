@@ -21,7 +21,7 @@ def decode_record(
     int,
     list[str],
 ]:
-    logging.info("pre record %s", buffer[:40].hex(" "))
+    logging.debug("pre record %s", buffer[:40].hex(" "))
 
     pos_length, length = decode_varint(buffer, signed=True)
     if pos_length == 0:
