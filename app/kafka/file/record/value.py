@@ -49,9 +49,8 @@ def decode_record_value(
         total_length += pos_feature_level
     else:
         logging.warning("unhandled record type %d", record_type)
-        total_length += value_length - 3
         return (
-            total_length,
+            pos_value_length + value_length,
             frame_version,
             record_type,
             record_version,
@@ -66,7 +65,19 @@ def decode_record_value(
     total_length += pos_fields
 
     for _ in range(fields_count):
-        pass
+        logging.error(
+            "unhandled field (expected count %d)\nbuffer %s",
+            fields_count,
+            buffer[:20].hex(" "),
+        )
+        return (
+            pos_value_length + value_length,
+            frame_version,
+            record_type,
+            record_version,
+            record_data,
+            fields,
+        )
 
     return (
         total_length,

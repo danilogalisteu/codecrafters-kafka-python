@@ -76,7 +76,25 @@ def decode_record(
 
     headers: list[str] = []
     for _ in range(headers_count):
-        pass
+        logging.error(
+            "unhandled header (expected count %d)\nbuffer %s",
+            headers_count,
+            buffer[:20].hex(" "),
+        )
+        return (
+            pos_length + length,
+            length,
+            attr,
+            ts_delta,
+            offset_delta,
+            key,
+            frame_version,
+            record_type,
+            record_version,
+            record_data,
+            fields,
+            headers,
+        )
 
     return (
         total_length,
