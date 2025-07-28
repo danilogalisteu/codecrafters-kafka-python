@@ -42,41 +42,12 @@ def decode_batch(buffer: bytes) -> tuple[int, dict[str, int]]:
     records = []
     pos_records = 0
     for _ in range(records_length):
-        (
-            pos_record,
-            length,
-            attr,
-            ts_delta,
-            offset_delta,
-            key,
-            record_data,
-            headers,
-        ) = decode_record(buffer)
+        pos_record, record_info = decode_record(buffer)
         if pos_record == 0:
             return 0, {}
-        logging.info(
-            "Meta Record: %d %d %d %d %d %s %s %s",
-            pos_record,
-            length,
-            attr,
-            ts_delta,
-            offset_delta,
-            key,
-            record_data,
-            headers,
-        )
+        logging.info("Meta Record: %d %s", pos_record, record_info)
         buffer = buffer[pos_record:]
-        records.append(
-            (
-                length,
-                attr,
-                ts_delta,
-                offset_delta,
-                key,
-                record_data,
-                headers,
-            )
-        )
+        records.append(record_info)
         pos_records += pos_record
 
     return pos_header + pos_info + pos_records, {
