@@ -64,7 +64,7 @@ def decode_record_partition(
     buffer = buffer[pos_directories:]
     total_length += pos_directories
 
-    directories: list[int] = []
+    directories: list[bytes] = []
     for _ in range(directories_count - 1):
         directories.append(buffer[:16])
         buffer = buffer[16:]

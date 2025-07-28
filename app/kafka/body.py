@@ -1,8 +1,8 @@
 import struct
 
-from .constants import ApiKey, ErrorCode, TagBuffer
-from .types.string import decode_string_compact, encode_string_compact
-from .types.varint import decode_varint, encode_varint
+from app.kafka.constants import ApiKey, ErrorCode, TagBuffer
+from app.kafka.types.string import decode_string_compact, encode_string_compact
+from app.kafka.types.varint import decode_varint, encode_varint
 
 
 def decode_body_apiversions(recv_message: bytes) -> tuple[int, str, str]:

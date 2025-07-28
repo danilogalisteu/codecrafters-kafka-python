@@ -1,7 +1,7 @@
 import struct
 
-from .constants import TagBuffer
-from .types.string import decode_string
+from app.kafka.constants import TagBuffer
+from app.kafka.types.string import decode_string
 
 
 def decode_header(recv_message: bytes) -> tuple[int, int, int, int, str]:
