@@ -64,20 +64,27 @@ def decode_body_describetopicpartitions(
 def encode_body_apiversions(api_version: int, throttle_time: int) -> bytes:
     error_code = ErrorCode.UNSUPPORTED_VERSION if api_version != 4 else ErrorCode.NONE
     send_message = struct.pack(">h", error_code)
-    send_message += encode_varint(3)
+    send_message += encode_varint(4)
+    send_message += struct.pack(
+        ">hhhB",
+        ApiKey.Fetch,
+        0,
+        16,
+        TagBuffer,
+    )
     send_message += struct.pack(
         ">hhhB",
         ApiKey.ApiVersions,
         0,
         4,
-        0,
+        TagBuffer,
     )
     send_message += struct.pack(
         ">hhhB",
         ApiKey.DescribeTopicPartitions,
         0,
         0,
-        0,
+        TagBuffer,
     )
     send_message += struct.pack(">iB", throttle_time, TagBuffer)
     return send_message
