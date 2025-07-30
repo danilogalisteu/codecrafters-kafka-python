@@ -32,7 +32,7 @@ async def parse_message(
     if parsed_header == 0:
         return 0, b""
 
-    logging.warning(
+    logging.info(
         "Header: (%d) %d %d %d %s",
         message_size,
         api_key,
@@ -50,7 +50,7 @@ async def parse_message(
 
         assert message_size == parsed_header + parsed_body, "unexpected message size"
 
-        logging.warning(
+        logging.info(
             "Body ApiVersions: %s %s",
             body_client_id,
             body_sw_version,
@@ -71,7 +71,7 @@ async def parse_message(
 
         assert message_size == parsed_header + parsed_body, "unexpected message size"
 
-        logging.warning(
+        logging.info(
             "Body DescribeTopicPartitions: %s %s %s",
             topic_array,
             partition_limit,
