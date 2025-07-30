@@ -75,9 +75,33 @@ async def parse_message(
             cursor,
         )
 
+        topic_dict = {
+            record["name"]: record["topic_uuid"]
+            for batch in batches
+            for record in batch["records"]
+            if record["record_type"] == RecordType.TOPIC
+            if record["name"] in topic_array
+        }
+
+        topic_dict = {
+            topic_name: (
+                topic_id,
+                [
+                    record
+                    for batch in batches
+                    for record in batch["records"]
+                    if record["record_type"] == RecordType.PARTITION
+                    if record["topic_uuid"] == topic_id
+                ],
+            )
+            for topic_name, topic_id in topic_dict.items()
+        }
+
         throttle_time = 0
         send_message = encode_header(correlation_id) + TagBuffer.to_bytes(1)
-        send_message += encode_body_describetopicpartitions(topic_array, throttle_time)
+        send_message += encode_body_describetopicpartitions(
+            topic_array, topic_dict, throttle_time
+        )
 
         return 4 + message_size, struct.pack(">i", len(send_message)) + send_message
 
