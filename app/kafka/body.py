@@ -84,23 +84,52 @@ def encode_body_apiversions(api_version: int, throttle_time: int) -> bytes:
 
 
 def encode_body_describetopicpartitions(
-    topic_array: list[str], throttle_time: int
+    topic_array: list[str], topic_dict: dict[str, bytes], throttle_time: int
 ) -> bytes:
     send_message = struct.pack(">I", throttle_time)
     send_message += encode_varint(1 + len(topic_array))
 
-    for topic in topic_array:
-        error_code = ErrorCode.UNKNOWN_TOPIC_OR_PARTITION
-        topic_id = (0).to_bytes(16)
+    for topic_name in topic_array:
+        if topic_name in topic_dict:
+            error_code = ErrorCode.NONE
+            uuid = topic_dict[topic_name][0]
+        else:
+            error_code = ErrorCode.UNKNOWN_TOPIC_OR_PARTITION
+            uuid = (0).to_bytes(16)
         is_internal = (0).to_bytes(1)
         auth_operations = 0x00000DF8
-        next_cursor = 0xFF
         send_message += struct.pack(">h", error_code)
-        send_message += encode_string_compact(topic)
-        send_message += topic_id
+        send_message += encode_string_compact(topic_name)
+        send_message += uuid
         send_message += is_internal
-        send_message += encode_varint(1)  # empty partitions array
+
+        if topic_name not in topic_dict:
+            send_message += encode_varint(1)
+
+        else:
+            send_message += encode_varint(1 + len(topic_dict[topic_name][1]))
+            for partition in topic_dict[topic_name][1]:
+                send_message += struct.pack(">h", error_code)
+                send_message += struct.pack(">I", partition["partition"])
+                send_message += struct.pack(">I", partition["leader"])
+                send_message += struct.pack(">I", partition["leader_epoch"])
+
+                send_message += encode_varint(1 + len(partition["replicas"]))
+                for replica in partition["replicas"]:
+                    send_message += struct.pack(">I", replica)
+
+                send_message += encode_varint(1 + len(partition["insync"]))
+                for insync in partition["insync"]:
+                    send_message += struct.pack(">I", insync)
+
+                send_message += encode_varint(1)
+                send_message += encode_varint(1)
+                send_message += encode_varint(1)
+
+                send_message += TagBuffer.to_bytes(1)
+
         send_message += struct.pack("<IB", auth_operations, TagBuffer)
 
+    next_cursor = 0xFF
     send_message += struct.pack("BB", next_cursor, TagBuffer)
     return send_message
