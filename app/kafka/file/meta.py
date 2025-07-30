@@ -6,7 +6,14 @@ from lib import curio
 from .batch import decode_batch
 
 
-async def read_meta(path: Path) -> list[dict[str, int]]:
+async def read_meta(
+    path: Path,
+) -> list[
+    dict[
+        str,
+        int | list[dict[str, str | int | bytes | list[int] | list[bytes] | list[str]]],
+    ]
+]:
     if not path.is_file():
         return []
 
