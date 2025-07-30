@@ -13,9 +13,12 @@ from .header import decode_header, encode_header
 
 async def parse_message(
     recv_message: bytes,
-    batches: dict[
-        str,
-        int | list[dict[str, str | int | bytes | list[int] | list[bytes] | list[str]]],
+    batches: list[
+        dict[
+            str,
+            int
+            | list[dict[str, str | int | bytes | list[int] | list[bytes] | list[str]]],
+        ]
     ],
 ) -> tuple[int, bytes]:
     if len(recv_message) < 4:
