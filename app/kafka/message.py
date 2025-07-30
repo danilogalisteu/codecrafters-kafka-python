@@ -7,11 +7,17 @@ from .body import (
     encode_body_apiversions,
     encode_body_describetopicpartitions,
 )
-from .constants import ApiKey, TagBuffer
+from .constants import ApiKey, RecordType, TagBuffer
 from .header import decode_header, encode_header
 
 
-async def parse_message(recv_message: bytes) -> tuple[int, bytes]:
+async def parse_message(
+    recv_message: bytes,
+    batches: dict[
+        str,
+        int | list[dict[str, str | int | bytes | list[int] | list[bytes] | list[str]]],
+    ],
+) -> tuple[int, bytes]:
     if len(recv_message) < 4:
         return 0, b""
 
@@ -63,7 +69,7 @@ async def parse_message(recv_message: bytes) -> tuple[int, bytes]:
         assert message_size == parsed_header + parsed_body, "unexpected message size"
 
         logging.warning(
-            "Body DescribeTopicPartitions : %s %s %s",
+            "Body DescribeTopicPartitions: %s %s %s",
             topic_array,
             partition_limit,
             cursor,
