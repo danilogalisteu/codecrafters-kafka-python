@@ -6,13 +6,9 @@ from app.kafka.types.varint import decode_varint
 def decode_record_partition(
     buffer: bytes,
 ) -> tuple[int, dict[str, int | bytes | list[int] | list[bytes]]]:
-    (partition_id,) = struct.unpack(">I", buffer[:4])
-    buffer = buffer[4:]
-    total_length = 4
-
-    topic_uuid = buffer[:16]
-    buffer = buffer[16:]
-    total_length += 16
+    partition_id, topic_uuid = struct.unpack(">I16s", buffer[:20])
+    buffer = buffer[20:]
+    total_length = 20
 
     pos_replica, replica_count = decode_varint(buffer)
     buffer = buffer[pos_replica:]
@@ -54,11 +50,9 @@ def decode_record_partition(
         buffer = buffer[4:]
         total_length += 4
 
-    leader, leader_state, leader_epoch, partition_epoch = struct.unpack(
-        ">IBII", buffer[:13]
-    )
-    buffer = buffer[13:]
-    total_length += 13
+    leader, leader_epoch, partition_epoch = struct.unpack(">III", buffer[:12])
+    buffer = buffer[12:]
+    total_length += 12
 
     pos_directories, directories_count = decode_varint(buffer)
     buffer = buffer[pos_directories:]
@@ -74,7 +68,6 @@ def decode_record_partition(
         "partition": partition_id,
         "topic_uuid": topic_uuid,
         "leader": leader,
-        "leader_state": leader_state,
         "leader_epoch": leader_epoch,
         "partition_epoch": partition_epoch,
         "replicas": replicas,
