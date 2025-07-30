@@ -11,28 +11,24 @@ from .topic import decode_record_topic
 
 def decode_record_value(
     buffer: bytes,
-) -> tuple[
-    int,
-    dict[str, str | int | bytes | list[str] | list[int] | list[bytes]],
-]:
+) -> tuple[int, dict[str, str | int | bytes | list[str] | list[int] | list[bytes]]]:
     pos_value_length, value_length = decode_varint(buffer, signed=True)
     if pos_value_length == 0:
         return 0, {}
     buffer = buffer[pos_value_length:]
     total_length = pos_value_length
+    record_data = {"value_length": value_length}
 
     if len(buffer) < value_length:
-        return 0, {}
+        return 0, record_data
 
     frame_version, record_type, record_version = struct.unpack(">BBB", buffer[:3])
     buffer = buffer[3:]
     total_length += 3
+    record_data["frame_version"] = frame_version
+    record_data["record_type"] = record_type
+    record_data["record_version"] = record_version
 
-    record_data: dict[str, str | int | bytes | list[str] | list[int] | list[bytes]] = {
-        "frame_version": frame_version,
-        "record_type": RecordType(record_type),
-        "record_version": record_version,
-    }
     fields: list[str] = []
 
     if record_type == RecordType.TOPIC:
@@ -52,6 +48,7 @@ def decode_record_value(
         record_data["fields"] = fields
         return pos_value_length + value_length, record_data
 
+    record_data["record_type"] = RecordType(record_type)
     record_data = {**record_data, **record_value}
 
     pos_fields, fields_count = decode_varint(buffer)
