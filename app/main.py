@@ -1,14 +1,25 @@
 import logging
+from pathlib import Path
 
-from app.kafka import parse_message
+from app.kafka import parse_message, read_meta
 from lib import curio
 
 logging.basicConfig(
-    format="[%(asctime)s|%(levelname)s] %(message)s", level=logging.INFO
+    format="[%(asctime)s|%(levelname)s] %(message)s", level=logging.WARNING
 )
 
 
-async def client_cb(client: curio.io.Socket, addr: tuple[str, int]) -> None:
+async def client_cb(
+    client: curio.io.Socket,
+    addr: tuple[str, int],
+    batches: list[
+        dict[
+            str,
+            int
+            | list[dict[str, str | int | bytes | list[int] | list[bytes] | list[str]]],
+        ]
+    ],
+) -> None:
     logging.info("[%s] New connection", addr)
 
     recv_message = b""
@@ -24,7 +35,7 @@ async def client_cb(client: curio.io.Socket, addr: tuple[str, int]) -> None:
                     len(recv_message),
                     recv_message.hex(" "),
                 )
-                parsed_length, send_message = await parse_message(recv_message)
+                parsed_length, send_message = await parse_message(recv_message, batches)
 
         recv_message = recv_message[parsed_length:]
         logging.warning(
@@ -35,9 +46,20 @@ async def client_cb(client: curio.io.Socket, addr: tuple[str, int]) -> None:
     logging.info("[%s] Closing connection", addr)
 
 
-def main() -> None:
+async def init() -> None:
+    batches = await read_meta(
+        Path("/tmp/kraft-combined-logs/__cluster_metadata-0/00000000000000000000.log")
+    )
+
+    async def client_meta_cb(client: curio.io.Socket, addr: tuple[str, int]) -> None:
+        return await client_cb(client, addr, batches)
+
     print("Serving on localhost:9092...")
-    curio.run(curio.tcp_server, "localhost", 9092, client_cb)
+    await curio.tcp_server("localhost", 9092, client_meta_cb)
+
+
+def main() -> None:
+    curio.run(init)
 
 
 if __name__ == "__main__":
